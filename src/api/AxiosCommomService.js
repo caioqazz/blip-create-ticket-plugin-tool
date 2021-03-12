@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify'
 
 export class AxiosCommomService {
-  static loadingHookFunc = () => { }
+  static loadingHookFunc = () => {}
 
   static startLoading = () => {
     this.loadingHookFunc(true)
@@ -16,19 +16,18 @@ export class AxiosCommomService {
   static setLoadingHookFunc = async (func) => {
     this.loadingHookFunc = func
   }
-  static resolveAfter3Seconds(time) {
-    return new Promise(resolve => {
+  static resolveAfterSeconds(time) {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(true);
-      }, time);
-    });
+        resolve(true)
+      }, time)
+    })
   }
 
   static withLoading = async (func, waitTime) => {
     this.startLoading()
-    console.log("time",waitTime)
-    waitTime !== undefined &&
-      await this.resolveAfter3Seconds(waitTime)
+    console.log('time', waitTime)
+    waitTime !== undefined && (await this.resolveAfterSeconds(waitTime))
     try {
       return await func()
     } finally {

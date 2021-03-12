@@ -32,7 +32,7 @@ function App() {
     })
   }, [])
 
-  const title = `Sample ${isHttp ? 'Tool' : 'Plugin'}`
+  const title = `Blip - Create a ticket ${isHttp ? 'Tool' : 'Plugin'}`
 
   return (
     <CommonProvider>

@@ -28,3 +28,11 @@ export const removeEmptyFields = (data) => {
   }
   return items
 }
+
+export const isInside24hrsWindow = (contactDate) => {
+  const date = new Date(contactDate)
+  date.setDate(date.getDate() + 1)
+  const currentDate = new Date()
+
+  return date.toISOString() > currentDate.toISOString()
+}

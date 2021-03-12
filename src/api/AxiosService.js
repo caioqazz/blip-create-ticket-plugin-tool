@@ -14,7 +14,6 @@ export class AxiosService {
     this.url = url
   }
 
-
   static getThreads = async () => {
     const body = {
       id: uuidv4(),
@@ -37,7 +36,7 @@ export class AxiosService {
     const body = {
       id: uuidv4(),
       method: 'get',
-      uri: `${owner ? `lime://${owner}` : ''}` + `/contacts/${contactIdentity}`,
+      uri: `${owner ? `lime://${owner}` : ''}/contacts/${contactIdentity}`,
     }
 
     try {
@@ -96,11 +95,13 @@ export class AxiosService {
       } = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log(resource)
+
+      if (!resource) throw new Error()
+
       return resource
     } catch (error) {
       AxiosCommomService.showErrorToast(`Error create a ticket ${error}`)
-      return []
+      return
     }
   }
   static setState = async (flowId, stateId, contactId, owner) => {
@@ -213,7 +214,6 @@ export class AxiosService {
         shortName: application.caller.split('@')[0],
         applicationJson: JSON.parse(application.value),
       }
-
     } catch (error) {
       AxiosCommomService.showErrorToast(`Error loading application ${error}`)
       return { shortName: 'botId' }

@@ -4,9 +4,7 @@ import { FiHelpCircle } from 'react-icons/fi'
 import PropTypes from 'prop-types'
 
 const CommandForm = ({ handleSubmit }) => {
-  const [key, setkey] = useState(
-    'Key ZmVjaGFydGlja2V0cG9yY2xpZW50ZTpwa2xZTURwYXVXYmJ5dEhxdENWcQ=='
-  )
+  const [key, setkey] = useState('Key YXRlbjc6M1RaVFNCZVM2UmRjekY1dWhsajQ=')
   const [url, setUrl] = useState('https://http.msging.net/commands')
 
   return (
