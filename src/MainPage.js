@@ -12,31 +12,49 @@ function MainPage({ service, commomService }) {
   const [contact, setContact] = useState()
   const [ticket, setTicket] = useState()
   const [tunnel, setTunnel] = useState()
+  const [isRouter, setIsRouter] = useState(false)
   const [botFields, setBotFields] = useState({
     flowId: '',
     deskId: '',
     context: 'false',
   })
+  const checkRequiredFields = (data) => {
+    console.log(!data.states.find((e) => e.id.includes('desk')).id)
+    if (!data.states.find((e) => e.id.includes('desk')).id)
+      throw new Error('What is desk block?')
+
+    return true
+  }
 
   const fetchApi = async () => {
     try {
       const application = await service.getApplication()
-      setBotFields({
-        flowId: application.applicationJson.settings.flow.id,
-        deskId: application.applicationJson.settings.flow.states.find((e) =>
-          e.id.includes('desk')
-        ).id,
-        context: application.applicationJson.settings.flow.configuration.hasOwnProperty(
-          'builder:useTunnelOwnerContext'
-        )
-          ? application.applicationJson.settings.flow.configuration[
+      setIsRouter(
+        application.applicationJson.settings.hasOwnProperty('children')
+      )
+
+      if (
+        application &&
+        !application.applicationJson.settings.hasOwnProperty('children') &&
+        checkRequiredFields(application.applicationJson.settings.flow)
+      ) {
+        const desk = application.applicationJson.settings.flow.states.find(
+          (e) => e.id.includes('desk')
+        ).id
+
+        setBotFields({
+          flowId: application.applicationJson.settings.flow.id,
+          deskId: desk,
+          context:
+            application.applicationJson.settings.flow.configuration.hasOwnProperty(
               'builder:useTunnelOwnerContext'
-            ]
-          : 'false',
-      })
-    } catch (error) {}
+            ) || false,
+        })
+      }
+    } catch (error) {
+      console.error('erro fetchApi ' + error)
+    }
   }
-  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
   const handleContactLoad = async (e) => {
     e.preventDefault()
@@ -73,8 +91,6 @@ function MainPage({ service, commomService }) {
           contact.identity,
           tunnel.owner
         )
-      }, 5000)
-      commomService.withLoading(async () => {
         setTicket(await service.createTicket(contactId))
       })
     } else {
@@ -84,8 +100,6 @@ function MainPage({ service, commomService }) {
           botFields.deskId,
           contact.identity
         )
-      }, 5000)
-      commomService.withLoading(async () => {
         setTicket(await service.createTicket(contact.identity))
       })
     }
@@ -95,56 +109,58 @@ function MainPage({ service, commomService }) {
     commomService.withLoading(async () => {
       await fetchApi()
     })
-  }, [])
+  }, [service, commomService])
+  const Test = () => {
+    return (
+      <div id="tab-nav" className="bp-tabs-container">
+        {/* Contact id Form */}
 
-  return (
-    <div id="tab-nav" className="bp-tabs-container">
-      {/* Contact id Form */}
-      <Form
-        onSubmit={(e) => {
-          handleContactLoad(e)
-        }}
-      >
-        <Form.Label>Contact Id</Form.Label>
-        <Form.Control
-          type="text"
-          value={contactId}
-          onChange={(e) => {
-            setContactId(e.target.value)
+        <Form
+          onSubmit={(e) => {
+            handleContactLoad(e)
           }}
-          required
-        />
-        <br />
-        <Button className="float-right" type="submit">
-          Load
-        </Button>
-      </Form>
-
-      {contact ? (
-        <>
-          <br />
-          <ContactCard data={contact} onUpdate={() => {}} />
-          <hr />
-          <Button
-            className="float-right"
-            type="submit"
-            variant="success"
-            block
-            style={{ display: ticket ? 'none' : '' }}
-            onClick={() => {
-              handleCreateTicket()
+        >
+          <Form.Label>Contact Id</Form.Label>
+          <Form.Control
+            type="text"
+            value={contactId}
+            onChange={(e) => {
+              setContactId(e.target.value)
             }}
-          >
-            Create a Ticket
+            required
+          />
+          <br />
+          <Button className="float-right" type="submit">
+            Load
           </Button>
-        </>
-      ) : (
-        <></>
-      )}
-      <br />
-      {ticket ? <TicketCard data={ticket} /> : <></>}
-    </div>
-  )
+        </Form>
+
+        {contact && (
+          <>
+            <br />
+            <ContactCard contact={contact} onUpdate={() => {}} />
+            <hr />
+            <Button
+              className="float-right"
+              type="submit"
+              variant="success"
+              block
+              style={{ display: ticket ? 'none' : '' }}
+              onClick={() => {
+                handleCreateTicket()
+              }}
+            >
+              Create a Ticket
+            </Button>
+          </>
+        )}
+        <br />
+        {ticket && <TicketCard data={ticket} />}
+      </div>
+    )
+  }
+
+  return !isRouter ? <Test /> : <>Router</>
 }
 MainPage.propTypes = {
   service: PropTypes.elementType.isRequired,

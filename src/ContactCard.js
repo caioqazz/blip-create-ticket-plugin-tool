@@ -4,8 +4,7 @@ import PropTypes from 'prop-types'
 import { Form, Col, Button, Card, Alert } from 'react-bootstrap'
 import { isInside24hrsWindow } from './util'
 import { AiOutlineWarning } from 'react-icons/ai'
-function ContactCard({ data, onUpdate }) {
-  const [contact, setContact] = useState(data)
+function ContactCard({ contact, onUpdate }) {
   const [isUpdatable, setIsUpdatable] = useState(false)
 
   const MessageActiveAlert = () => {
@@ -14,8 +13,8 @@ function ContactCard({ data, onUpdate }) {
         <Alert variant="danger">
           <AiOutlineWarning size="30" />
           If you create a ticket,{' '}
-          <b>you can only chat by sending ative messages</b>{' '}
-          because <b>the last message isn't in the 24 hours window.</b>
+          <b>you can only chat by sending ative messages</b> because{' '}
+          <b>the last message isn't in the 24 hours window.</b>
         </Alert>
       )
     else return <></>
@@ -31,7 +30,7 @@ function ContactCard({ data, onUpdate }) {
             type="text"
             value={contact.name}
             onChange={(e) => {
-              setContact({ ...contact, name: e.target.value })
+              // setContact({ ...contact, name: e.target.value })
             }}
             required
             readOnly={!isUpdatable}
@@ -41,7 +40,7 @@ function ContactCard({ data, onUpdate }) {
             type="text"
             value={contact.email}
             onChange={(e) => {
-              setContact({ ...contact, email: e.target.value })
+              //setContact({ ...contact, email: e.target.value })
             }}
             required
             readOnly={!isUpdatable}
@@ -57,7 +56,7 @@ function ContactCard({ data, onUpdate }) {
           <br />
           <b>Extras</b>
           <br />
-          {Object.keys(contact.extras).map((k) => {
+          {contact.extras && Object.keys(contact.extras).map((k) => {
             return (
               <Form.Row key={k}>
                 <Form.Group as={Col} md="6" controlId="formGridKey">
@@ -68,10 +67,10 @@ function ContactCard({ data, onUpdate }) {
                     type="text"
                     value={contact.extras[k]}
                     onChange={(e) => {
-                      setContact({
+                      /* setContact({
                         ...contact,
                         extras: { ...contact.extras, [`${k}`]: e.target.value },
-                      })
+                      })*/
                     }}
                     required
                     readOnly={!isUpdatable}
@@ -96,7 +95,7 @@ function ContactCard({ data, onUpdate }) {
 }
 
 ContactCard.propTypes = {
-  data: PropTypes.object.isRequired,
+  contact: PropTypes.object.isRequired,
   onUpdate: PropTypes.elementType.isRequired,
 }
 export default ContactCard

@@ -53,6 +53,9 @@ const CommandForm = ({ handleSubmit }) => {
               setkey(e.target.value)
             }}
           />
+          <Form.Text className="text-muted" style={{ padding: '0px 1px' }}>
+            If you are using the router architecture always fill in the <b>customer service subbot key</b>
+          </Form.Text>
         </Col>
         <Col sm="1">
           <a

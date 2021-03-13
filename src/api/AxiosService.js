@@ -13,7 +13,7 @@ export class AxiosService {
     }
     this.url = url
   }
-
+  static wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   static getThreads = async () => {
     const body = {
       id: uuidv4(),
@@ -78,6 +78,7 @@ export class AxiosService {
     }
   }
   static createTicket = async (customerIdentity) => {
+    console.log('create ticket start')
     const body = {
       id: uuidv4(),
       method: 'set',
@@ -104,7 +105,9 @@ export class AxiosService {
       return
     }
   }
+
   static setState = async (flowId, stateId, contactId, owner) => {
+    console.log('setState start')
     const body = {
       id: uuidv4(),
       method: 'set',
@@ -120,6 +123,8 @@ export class AxiosService {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
+
+      await this.wait(3000)
       console.log(response)
       return response
     } catch (error) {
@@ -128,6 +133,7 @@ export class AxiosService {
     }
   }
   static setMasterState = async (originator, destination, owner) => {
+    console.log('setMasterState start')
     const body = {
       id: uuidv4(),
       method: 'set',
@@ -138,11 +144,11 @@ export class AxiosService {
       type: 'text/plain',
       resource: `${destination}`,
     }
-    console.log('setMasterState', body)
     try {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
+      await this.wait(3000)
       console.log(response)
       return response
     } catch (error) {

@@ -26,7 +26,6 @@ export class AxiosCommomService {
 
   static withLoading = async (func, waitTime) => {
     this.startLoading()
-    console.log('time', waitTime)
     waitTime !== undefined && (await this.resolveAfterSeconds(waitTime))
     try {
       return await func()
