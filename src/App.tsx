@@ -17,7 +17,7 @@ function App() {
   const [isFormHttpFilled, setIsFormHttpFilled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fillHeader = (e, { key, url }) => {
+  const fillHeader = (e, { key, url }): void => {
     e.preventDefault()
     AxiosCommomService.withLoading(async () => {
       AxiosService.init(key, url)
@@ -32,7 +32,7 @@ function App() {
     })
   }, [])
 
-  const title = `Blip - Create a ticket ${isHttp ? 'Tool' : 'Plugin'}`
+  const title: string = `Blip - Create a ticket ${isHttp ? 'Tool' : 'Plugin'}`
 
   return (
     <CommonProvider>
@@ -70,14 +70,12 @@ function App() {
             }}
           >
             {isHttp && !isFormHttpFilled ? (
-              <CommandForm
-                style={{ padding: '100px' }}
-                handleSubmit={fillHeader}
-              />
+              <CommandForm handleSubmit={fillHeader} />
             ) : (
               <MainPage
                 service={!isHttp ? ApplicationService : AxiosService}
                 commomService={!isHttp ? CommomService : AxiosCommomService}
+                onApplicationError={setIsFormHttpFilled}
               />
             )}
           </LoadingOverlay>

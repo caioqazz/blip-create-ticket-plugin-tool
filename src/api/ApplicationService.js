@@ -48,6 +48,28 @@ export class ApplicationService {
     }
   }
 
+  static mergeContact = async (contact) => {
+    try {
+      const response = await IframeMessageProxy.sendMessage({
+        action: 'sendCommand',
+        content: {
+          destination: 'MessagingHubService',
+          command: {
+            method: 'merge',
+            type: 'application/vnd.lime.contact+json',
+            uri: '/contacts',
+            resource: contact,
+          },
+        },
+      })
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error(`Error to load ${error}`)
+      return []
+    }
+  }
+
   static getThreads = async () => {
     try {
       const {

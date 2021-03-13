@@ -19,9 +19,11 @@ function TicketCard({ data }) {
                 <Form.Group as={Col} md="5" controlId="formGridKey">
                   <Form.Control
                     type="text"
-                    value={typeof ticket[k] !== 'object'
-                      ? ticket[k]
-                      : JSON.stringify(ticket[k])}
+                    value={
+                      typeof ticket[k] !== 'object'
+                        ? ticket[k]
+                        : JSON.stringify(ticket[k])
+                    }
                     onChange={(e) => {
                       setTicket({
                         ...ticket,

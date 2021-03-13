@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import 'blip-toolkit/dist/blip-toolkit.css'
 import PropTypes from 'prop-types'
-import { Form, Button } from 'react-bootstrap'
+import { Form, Button, Alert } from 'react-bootstrap'
 import ContactCard from './ContactCard'
 import TicketCard from './TicketCard'
-
-function MainPage({ service, commomService }) {
+import { AiOutlineWarning } from 'react-icons/ai'
+function MainPage({ service, commomService, onApplicationError }) {
   const [contactId, setContactId] = useState(
-    '975442ef-1417-4a03-8a59-253a1d586b61@tunnel.msging.net'
+    'f7ca8fdc-5bea-4e6a-b128-bfe2a65516f7@tunnel.msging.net'
   )
   const [contact, setContact] = useState()
   const [ticket, setTicket] = useState()
-  const [tunnel, setTunnel] = useState()
+  const [tunnel, setTunnel] = useState('')
   const [isRouter, setIsRouter] = useState(false)
   const [botFields, setBotFields] = useState({
     flowId: '',
     deskId: '',
     context: 'false',
   })
-  const checkRequiredFields = (data) => {
-    console.log(!data.states.find((e) => e.id.includes('desk')).id)
-    if (!data.states.find((e) => e.id.includes('desk')).id)
-      throw new Error('What is desk block?')
+
+  const checkRequiredFields = (settings) => {
+    if (!settings.flow.states.find((e) => e.id.includes('desk'))) {
+      commomService.showErrorToast('Could not find desk block in your flow')
+      throw new Error('Could not find desk block in your flow')
+    }
 
     return true
   }
@@ -36,7 +38,7 @@ function MainPage({ service, commomService }) {
       if (
         application &&
         !application.applicationJson.settings.hasOwnProperty('children') &&
-        checkRequiredFields(application.applicationJson.settings.flow)
+        checkRequiredFields(application.applicationJson.settings)
       ) {
         const desk = application.applicationJson.settings.flow.states.find(
           (e) => e.id.includes('desk')
@@ -52,13 +54,14 @@ function MainPage({ service, commomService }) {
         })
       }
     } catch (error) {
-      console.error('erro fetchApi ' + error)
+      console.error('Error fetchApi ' + error)
+      onApplicationError(false)
     }
   }
 
   const handleContactLoad = async (e) => {
     e.preventDefault()
-    setTicket()
+    setTicket(undefined)
 
     if (botFields.context === 'true' && contactId.includes('tunnel'))
       commomService.withLoading(async () => {
@@ -75,6 +78,15 @@ function MainPage({ service, commomService }) {
       commomService.withLoading(async () => {
         setContact(await service.getContact(contactId))
       })
+  }
+
+  const handleContactUpdate = (e, updatedContact) => {
+    e.preventDefault()
+    commomService.withLoading(async () => {
+      if (await service.mergeContact(updatedContact)) {
+        setContact(await service.getContact(contactId))
+      }
+    })
   }
 
   const handleCreateTicket = () => {
@@ -110,7 +122,8 @@ function MainPage({ service, commomService }) {
       await fetchApi()
     })
   }, [service, commomService])
-  const Test = () => {
+
+  const BuilderBox = () => {
     return (
       <div id="tab-nav" className="bp-tabs-container">
         {/* Contact id Form */}
@@ -138,8 +151,19 @@ function MainPage({ service, commomService }) {
         {contact && (
           <>
             <br />
-            <ContactCard contact={contact} onUpdate={() => {}} />
+            <ContactCard
+              data={contact}
+              onUpdate={(e, data) => {
+                handleContactUpdate(e, data)
+              }}
+            />
             <hr />
+            <Form.Check
+              style={{ display: ticket ? 'none' : '', padding: '10px' }}
+              type="checkbox"
+              label="Check me out"
+            />
+
             <Button
               className="float-right"
               type="submit"
@@ -159,11 +183,21 @@ function MainPage({ service, commomService }) {
       </div>
     )
   }
+  const RouterBox = () => {
+    return (
+      <Alert variant="danger">
+        <AiOutlineWarning size="30" />
+        This tool does not work on the router, please{' '}
+        <b>use it on the customer service subbot!</b>
+      </Alert>
+    )
+  }
 
-  return !isRouter ? <Test /> : <>Router</>
+  return !isRouter ? <BuilderBox /> : <RouterBox />
 }
 MainPage.propTypes = {
   service: PropTypes.elementType.isRequired,
+  onApplicationError: PropTypes.elementType.isRequired,
   commomService: PropTypes.elementType.isRequired,
 }
 export default MainPage

@@ -55,6 +55,31 @@ export class AxiosService {
       return
     }
   }
+
+  static mergeContact = async (contact, owner) => {
+    const body = {
+      id: uuidv4(),
+      method: 'merge',
+      type: 'application/vnd.lime.contact+json',
+      uri: `${owner ? `lime://${owner}` : ''}/contacts`,
+      resource: contact,
+    }
+    console.log(body)
+    try {
+      const response = await axios.post(this.url, body, {
+        headers: this.headers,
+      })
+      console.log(response)
+
+      if (response.status !== 200) throw new Error('')
+      await this.wait(4000)
+      return true
+    } catch (error) {
+      AxiosCommomService.showErrorToast(`Error merging contact ${error}`)
+      return false
+    }
+  }
+
   static getTunnelInfo = async (tunnel) => {
     const body = {
       id: uuidv4(),
