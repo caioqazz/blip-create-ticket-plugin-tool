@@ -13,6 +13,8 @@ function MainPage({ service, commomService, onApplicationError }) {
   const [ticket, setTicket] = useState()
   const [tunnel, setTunnel] = useState('')
   const [isRouter, setIsRouter] = useState(false)
+  const [message, setMessage] = useState({ active: false, value: '' })
+  const [x, setX] = useState('')
   const [botFields, setBotFields] = useState({
     flowId: '',
     deskId: '',
@@ -158,12 +160,29 @@ function MainPage({ service, commomService, onApplicationError }) {
               }}
             />
             <hr />
-            <Form.Check
-              style={{ display: ticket ? 'none' : '', padding: '10px' }}
-              type="checkbox"
-              label="Check me out"
-            />
+            <Form onSubmit={(e) => {
+              e.preventDefault()
+            }}>
+              <Form.Check
+                style={{ display: ticket ? 'none' : '', padding: '10px' }}
+                type="checkbox"
+                defaultChecked={message.active}
+                onChange={(e) => {
+                  setMessage({ ...message, active: e.target.checked })
+                }}
+                label="Send a message before creating a ticket"
+              />
 
+              <Form.Label>Message:</Form.Label>
+              <Form.Control
+                type="text"
+                value={x}
+                onChange={(e) => {
+                  setX(e.target.value)
+                }}
+              />
+              <hr />
+            </Form>
             <Button
               className="float-right"
               type="submit"
@@ -179,7 +198,7 @@ function MainPage({ service, commomService, onApplicationError }) {
           </>
         )}
         <br />
-        {ticket && <TicketCard data={ticket} />}
+        <TicketCard data={ticket} />
       </div>
     )
   }

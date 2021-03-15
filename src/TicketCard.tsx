@@ -5,7 +5,7 @@ import { Form, Col, Card } from 'react-bootstrap'
 
 function TicketCard({ data }) {
   const [ticket, setTicket] = useState(data)
-  return (
+  return data ? (
     <Card border="success">
       <Card.Body>
         <Form>
@@ -40,6 +40,8 @@ function TicketCard({ data }) {
         </Form>
       </Card.Body>
     </Card>
+  ) : (
+    <></>
   )
 }
 TicketCard.propTypes = {
