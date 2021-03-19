@@ -46,7 +46,7 @@ export class AxiosService {
       const response = await axios.post(url, body, {
         headers: this.headers,
       })
-      await this.wait(3000)
+      await this.wait(1000)
       return response.status === 202
     } catch (error) {
       AxiosCommomService.showErrorToast(`Error send message ${error}`)
