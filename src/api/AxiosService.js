@@ -32,6 +32,28 @@ export class AxiosService {
       return []
     }
   }
+
+  static sendMessage = async (contactId, message) => {
+    console.log('send message')
+    const body = {
+      id: uuidv4(),
+      to: contactId,
+      type: 'text/plain',
+      content: message,
+    }
+    try {
+      const url = this.url.replace('commands', 'messages')
+      const response = await axios.post(url, body, {
+        headers: this.headers,
+      })
+      await this.wait(3000)
+      return response.status === 202
+    } catch (error) {
+      AxiosCommomService.showErrorToast(`Error send message ${error}`)
+      return false
+    }
+  }
+
   static getContact = async (contactIdentity, owner) => {
     const body = {
       id: uuidv4(),
@@ -45,8 +67,6 @@ export class AxiosService {
       } = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log(resource)
-
       if (resource === undefined) throw new Error('')
 
       return resource
@@ -121,7 +141,7 @@ export class AxiosService {
       } = await axios.post(this.url, body, {
         headers: this.headers,
       })
-
+      console.log({ resource })
       if (!resource) throw new Error()
 
       return resource
@@ -148,9 +168,9 @@ export class AxiosService {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
-
-      await this.wait(3000)
       console.log(response)
+      await this.wait(3000)
+
       return response
     } catch (error) {
       AxiosCommomService.showErrorToast(`Error setting state ${error}`)
@@ -173,7 +193,8 @@ export class AxiosService {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      await this.wait(3000)
+      console.log('setMasterState', response)
+      await this.wait(5000)
       console.log(response)
       return response
     } catch (error) {

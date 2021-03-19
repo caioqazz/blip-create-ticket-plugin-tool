@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'blip-toolkit/dist/blip-toolkit.css'
 import PropTypes from 'prop-types'
 import { Form, Col, Card } from 'react-bootstrap'
 
-function TicketCard({ data }) {
-  const [ticket, setTicket] = useState(data)
+function dataCard({ data }) {
   return data ? (
     <Card border="success">
       <Card.Body>
         <Form>
           <h5>Ticket Information</h5>
-          {Object.keys(ticket).map((k) => {
+          {Object.keys(data).map((k) => {
             return (
               <Form.Row key={k}>
                 <Form.Group as={Col} md="5" controlId="formGridKey">
@@ -20,16 +19,10 @@ function TicketCard({ data }) {
                   <Form.Control
                     type="text"
                     value={
-                      typeof ticket[k] !== 'object'
-                        ? ticket[k]
-                        : JSON.stringify(ticket[k])
+                      typeof data[k] !== 'object'
+                        ? data[k]
+                        : JSON.stringify(data[k])
                     }
-                    onChange={(e) => {
-                      setTicket({
-                        ...ticket,
-                        [`${k}`]: e.target.value,
-                      })
-                    }}
                     required
                     readOnly={true}
                   />
@@ -44,8 +37,8 @@ function TicketCard({ data }) {
     <></>
   )
 }
-TicketCard.propTypes = {
+dataCard.propTypes = {
   data: PropTypes.object.isRequired,
 }
 
-export default TicketCard
+export default dataCard

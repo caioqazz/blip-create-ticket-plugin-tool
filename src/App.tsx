@@ -26,6 +26,8 @@ function App() {
   }
 
   useEffect(() => {
+    console.log('useEffect App')
+
     AxiosCommomService.setLoadingHookFunc(setIsLoading)
     AxiosCommomService.withLoading(async () => {
       setIsHttp(!(await ApplicationService.ping()))

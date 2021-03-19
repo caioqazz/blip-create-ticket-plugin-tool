@@ -6,15 +6,12 @@ import ContactCard from './ContactCard'
 import TicketCard from './TicketCard'
 import { AiOutlineWarning } from 'react-icons/ai'
 function MainPage({ service, commomService, onApplicationError }) {
-  const [contactId, setContactId] = useState(
-    'f7ca8fdc-5bea-4e6a-b128-bfe2a65516f7@tunnel.msging.net'
-  )
+  const [contactId, setContactId] = useState('')
   const [contact, setContact] = useState()
   const [ticket, setTicket] = useState()
   const [tunnel, setTunnel] = useState('')
   const [isRouter, setIsRouter] = useState(false)
   const [message, setMessage] = useState({ active: false, value: '' })
-  const [x, setX] = useState('')
   const [botFields, setBotFields] = useState({
     flowId: '',
     deskId: '',
@@ -36,7 +33,13 @@ function MainPage({ service, commomService, onApplicationError }) {
       setIsRouter(
         application.applicationJson.settings.hasOwnProperty('children')
       )
-
+      console.log(
+        'contexto',
+        application.applicationJson.settings.flow.configuration.hasOwnProperty(
+          'builder:useTunnelOwnerContext'
+        ),
+        application.applicationJson.settings.flow.configuration
+      )
       if (
         application &&
         !application.applicationJson.settings.hasOwnProperty('children') &&
@@ -49,10 +52,13 @@ function MainPage({ service, commomService, onApplicationError }) {
         setBotFields({
           flowId: application.applicationJson.settings.flow.id,
           deskId: desk,
-          context:
-            application.applicationJson.settings.flow.configuration.hasOwnProperty(
+          context: application.applicationJson.settings.flow.configuration.hasOwnProperty(
+            'builder:useTunnelOwnerContext'
+          )
+            ? application.applicationJson.settings.flow.configuration[
               'builder:useTunnelOwnerContext'
-            ) || false,
+            ]
+            : 'false',
         })
       }
     } catch (error) {
@@ -63,18 +69,21 @@ function MainPage({ service, commomService, onApplicationError }) {
 
   const handleContactLoad = async (e) => {
     e.preventDefault()
-    setTicket(undefined)
+    console.log(botFields)
+    setTicket()
 
-    if (botFields.context === 'true' && contactId.includes('tunnel'))
+    if (contactId.includes('tunnel'))
       commomService.withLoading(async () => {
         const contactTunnel = await service.getTunnelInfo(contactId)
         setTunnel(contactTunnel)
-        setContact(
-          await service.getContact(
-            contactTunnel.originator,
-            contactTunnel.owner
+        botFields.context === 'true'
+          ? setContact(
+            await service.getContact(
+              contactTunnel.originator,
+              contactTunnel.owner
+            )
           )
-        )
+          : setContact(await service.getContact(contactId))
       })
     else
       commomService.withLoading(async () => {
@@ -87,35 +96,66 @@ function MainPage({ service, commomService, onApplicationError }) {
     commomService.withLoading(async () => {
       if (await service.mergeContact(updatedContact)) {
         setContact(await service.getContact(contactId))
+        commomService.showSuccessToast('Contact updated!')
       }
     })
   }
 
+  const createTicketTunnelContextEnable = () => {
+    commomService.withLoading(async () => {
+      await service.setMasterState(
+        tunnel.originator,
+        tunnel.destination,
+        tunnel.owner
+      )
+      if (message.active) await service.sendMessage(contactId, message.value)
+      await service.setState(
+        botFields.flowId,
+        botFields.deskId,
+        contact.identity,
+        tunnel.owner
+      )
+      setTicket(await service.createTicket(contactId))
+    })
+  }
+
+  const createTicketTunnelContextDisable = () => {
+    commomService.withLoading(async () => {
+      await service.setMasterState(
+        tunnel.originator,
+        tunnel.destination,
+        tunnel.owner
+      )
+      if (message.active) await service.sendMessage(contactId, message.value)
+      await service.setState(
+        botFields.flowId,
+        botFields.deskId,
+        contact.identity
+      )
+      setTicket(await service.createTicket(contactId))
+    })
+  }
+
+  const createTicketOriginator = () => {
+    commomService.withLoading(async () => {
+      if (message.active)
+        await service.sendMessage(contact.identity, message.value)
+      await service.setState(
+        botFields.flowId,
+        botFields.deskId,
+        contact.identity
+      )
+      setTicket(await service.createTicket(contact.identity))
+    })
+  }
+
   const handleCreateTicket = () => {
-    if (botFields.context === 'true' && contactId.includes('tunnel')) {
-      commomService.withLoading(async () => {
-        await service.setMasterState(
-          tunnel.originator,
-          tunnel.destination,
-          tunnel.owner
-        )
-        await service.setState(
-          botFields.flowId,
-          botFields.deskId,
-          contact.identity,
-          tunnel.owner
-        )
-        setTicket(await service.createTicket(contactId))
-      })
+    if (contactId.includes('tunnel')) {
+      botFields.context === 'true'
+        ? createTicketTunnelContextEnable()
+        : createTicketTunnelContextDisable()
     } else {
-      commomService.withLoading(async () => {
-        await service.setState(
-          botFields.flowId,
-          botFields.deskId,
-          contact.identity
-        )
-        setTicket(await service.createTicket(contact.identity))
-      })
+      createTicketOriginator()
     }
   }
 
@@ -125,83 +165,6 @@ function MainPage({ service, commomService, onApplicationError }) {
     })
   }, [service, commomService])
 
-  const BuilderBox = () => {
-    return (
-      <div id="tab-nav" className="bp-tabs-container">
-        {/* Contact id Form */}
-
-        <Form
-          onSubmit={(e) => {
-            handleContactLoad(e)
-          }}
-        >
-          <Form.Label>Contact Id</Form.Label>
-          <Form.Control
-            type="text"
-            value={contactId}
-            onChange={(e) => {
-              setContactId(e.target.value)
-            }}
-            required
-          />
-          <br />
-          <Button className="float-right" type="submit">
-            Load
-          </Button>
-        </Form>
-
-        {contact && (
-          <>
-            <br />
-            <ContactCard
-              data={contact}
-              onUpdate={(e, data) => {
-                handleContactUpdate(e, data)
-              }}
-            />
-            <hr />
-            <Form onSubmit={(e) => {
-              e.preventDefault()
-            }}>
-              <Form.Check
-                style={{ display: ticket ? 'none' : '', padding: '10px' }}
-                type="checkbox"
-                defaultChecked={message.active}
-                onChange={(e) => {
-                  setMessage({ ...message, active: e.target.checked })
-                }}
-                label="Send a message before creating a ticket"
-              />
-
-              <Form.Label>Message:</Form.Label>
-              <Form.Control
-                type="text"
-                value={x}
-                onChange={(e) => {
-                  setX(e.target.value)
-                }}
-              />
-              <hr />
-            </Form>
-            <Button
-              className="float-right"
-              type="submit"
-              variant="success"
-              block
-              style={{ display: ticket ? 'none' : '' }}
-              onClick={() => {
-                handleCreateTicket()
-              }}
-            >
-              Create a Ticket
-            </Button>
-          </>
-        )}
-        <br />
-        <TicketCard data={ticket} />
-      </div>
-    )
-  }
   const RouterBox = () => {
     return (
       <Alert variant="danger">
@@ -212,7 +175,91 @@ function MainPage({ service, commomService, onApplicationError }) {
     )
   }
 
-  return !isRouter ? <BuilderBox /> : <RouterBox />
+  return !isRouter ? (
+    <div id="tab-nav" className="bp-tabs-container">
+      {/* Contact id Form */}
+
+      <Form
+        onSubmit={(e) => {
+          handleContactLoad(e)
+        }}
+      >
+        <Form.Label>Contact Id</Form.Label>
+        <Form.Control
+          type="text"
+          value={contactId}
+          onChange={(e) => {
+            setContactId(e.target.value)
+          }}
+          required
+        />
+        <br />
+        <Button className="float-right" type="submit">
+          Load
+        </Button>
+      </Form>
+
+      {contact && (
+        <>
+          <br />
+          <ContactCard
+            data={contact}
+            onUpdate={(e, data) => {
+              handleContactUpdate(e, data)
+            }}
+          />
+          <hr />
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault()
+            }}
+          >
+            <Form.Check
+              style={{ display: ticket ? 'none' : '', padding: '10px' }}
+              type="checkbox"
+              defaultChecked={message.active}
+              onChange={(e) => {
+                setMessage({ ...message, active: e.target.checked })
+              }}
+              label="Send a message before creating a ticket"
+            />
+
+            {message.active && (
+              <>
+                {' '}
+                <Form.Label>Message:</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={message.value}
+                  onChange={(e) => {
+                    setMessage({ ...message, value: e.target.value })
+                  }}
+                />
+                <hr />
+              </>
+            )}
+          </Form>
+          <Button
+            className="float-right"
+            type="submit"
+            variant="success"
+            block
+            style={{ display: ticket ? 'none' : '' }}
+            onClick={() => {
+              handleCreateTicket()
+            }}
+          >
+            Create a Ticket
+          </Button>
+        </>
+      )}
+      <br />
+      <TicketCard data={ticket} />
+    </div>
+  ) : (
+    <RouterBox />
+  )
 }
 MainPage.propTypes = {
   service: PropTypes.elementType.isRequired,
