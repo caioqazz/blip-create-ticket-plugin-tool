@@ -42,7 +42,6 @@ export class ApplicationService {
           },
         },
       })
-      console.log(response)
       return response
     } catch (error) {
       console.error(`Error to load ${error}`)
@@ -50,15 +49,6 @@ export class ApplicationService {
     }
   }
   static getContact = async (contactIdentity, owner) => {
-    console.log({
-      content: {
-        destination: 'MessagingHubService',
-        command: {
-          method: 'get',
-          uri: `${owner ? `lime://${owner}` : ''}/contacts/${contactIdentity}`,
-        },
-      },
-    })
     try {
       const { response } = await IframeMessageProxy.sendMessage({
         action: 'sendCommand',
@@ -73,7 +63,6 @@ export class ApplicationService {
         },
       })
       if (response === undefined) throw new Error('')
-      console.log('getContact ' + JSON.stringify(response))
       return response
     } catch (error) {
       CommomService.showErrorToast(`Error loading contact ${error}`)
@@ -82,7 +71,7 @@ export class ApplicationService {
   }
   static mergeContact = async (contact, owner) => {
     try {
-      const response = await IframeMessageProxy.sendMessage({
+      await IframeMessageProxy.sendMessage({
         action: 'sendCommand',
         content: {
           destination: 'MessagingHubService',
@@ -95,8 +84,6 @@ export class ApplicationService {
         },
       })
       await this.wait(4000)
-      console.log('mergeContact ' + JSON.stringify(response))
-      //if (response === undefined) throw new Error('')
       return true
     } catch (error) {
       CommomService.showErrorToast(`Error loading contact ${error}`)
@@ -116,8 +103,6 @@ export class ApplicationService {
           },
         },
       })
-      // if (response === undefined) throw new Error('')
-      console.log('getTunnelInfo ' + JSON.stringify(response))
       return response
     } catch (error) {
       CommomService.showErrorToast(`Error getTunnelInfo ${error}`)
@@ -142,8 +127,6 @@ export class ApplicationService {
           },
         },
       })
-      //   if (!resource) throw new Error()
-      console.log('createTicket ' + JSON.stringify(response))
       return response
     } catch (error) {
       CommomService.showErrorToast(`Error createTicket ${error}`)
@@ -167,8 +150,6 @@ export class ApplicationService {
           },
         },
       })
-      //   if (!resource) throw new Error()
-      console.log('setState ' + JSON.stringify(response))
       await this.wait(3000)
       return response
     } catch (error) {
@@ -194,8 +175,6 @@ export class ApplicationService {
           },
         },
       })
-      //   if (!resource) throw new Error()
-      console.log('setMasterState ' + JSON.stringify(response))
       await this.wait(5000)
       return response
     } catch (error) {
@@ -205,7 +184,6 @@ export class ApplicationService {
   }
 
   static sendMessage = async (contactId, message) => {
-    console.log('sendMessage ')
     try {
       IframeMessageProxy.sendMessage({
         action: 'sendCommand',
@@ -218,8 +196,6 @@ export class ApplicationService {
           },
         },
       })
-      //   if (!resource) throw new Error()
-      console.log('sendMessage ')
       await this.wait(1000)
       return true
     } catch (error) {

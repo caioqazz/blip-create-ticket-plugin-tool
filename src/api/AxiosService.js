@@ -34,7 +34,6 @@ export class AxiosService {
   }
 
   static sendMessage = async (contactId, message) => {
-    console.log('send message')
     const body = {
       id: uuidv4(),
       to: contactId,
@@ -84,12 +83,10 @@ export class AxiosService {
       uri: `${owner ? `lime://${owner}` : ''}/contacts`,
       resource: contact,
     }
-    console.log(body)
     try {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log(response)
 
       if (response.status !== 200) throw new Error('')
       await this.wait(4000)
@@ -114,7 +111,6 @@ export class AxiosService {
       } = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log(resource)
 
       return resource
     } catch (error) {
@@ -123,7 +119,6 @@ export class AxiosService {
     }
   }
   static createTicket = async (customerIdentity) => {
-    console.log('create ticket start')
     const body = {
       id: uuidv4(),
       method: 'set',
@@ -141,7 +136,6 @@ export class AxiosService {
       } = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log({ resource })
       if (!resource) throw new Error()
 
       return resource
@@ -152,7 +146,6 @@ export class AxiosService {
   }
 
   static setState = async (flowId, stateId, contactId, owner) => {
-    console.log('setState start')
     const body = {
       id: uuidv4(),
       method: 'set',
@@ -163,12 +156,10 @@ export class AxiosService {
       type: 'text/plain',
       resource: `${stateId}`,
     }
-    console.log('setState', body)
     try {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log(response)
       await this.wait(3000)
 
       return response
@@ -178,7 +169,6 @@ export class AxiosService {
     }
   }
   static setMasterState = async (originator, destination, owner) => {
-    console.log('setMasterState start')
     const body = {
       id: uuidv4(),
       method: 'set',
@@ -193,9 +183,7 @@ export class AxiosService {
       const response = await axios.post(this.url, body, {
         headers: this.headers,
       })
-      console.log('setMasterState', response)
       await this.wait(5000)
-      console.log(response)
       return response
     } catch (error) {
       AxiosCommomService.showErrorToast(`Error setting masterstate ${error}`)
@@ -235,7 +223,6 @@ export class AxiosService {
         headers: this.headers,
       })
 
-      console.log(response)
       if (response.data.resource.items.length === 0) return 'More than 90 days'
 
       return response.data.resource.items.find(

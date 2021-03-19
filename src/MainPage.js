@@ -5,6 +5,8 @@ import { Form, Button, Alert } from 'react-bootstrap'
 import ContactCard from './ContactCard'
 import TicketCard from './TicketCard'
 import { AiOutlineWarning } from 'react-icons/ai'
+import { Constants } from './assets/Constants'
+
 function MainPage({ service, commomService, onApplicationError }) {
   const [contactId, setContactId] = useState('')
   const [contact, setContact] = useState()
@@ -31,34 +33,31 @@ function MainPage({ service, commomService, onApplicationError }) {
     try {
       const application = await service.getApplication()
       setIsRouter(
-        application.applicationJson.settings.hasOwnProperty('children')
-      )
-      console.log(
-        'contexto',
-        application.applicationJson.settings.flow.configuration.hasOwnProperty(
-          'builder:useTunnelOwnerContext'
-        ),
-        application.applicationJson.settings.flow.configuration
+        application.applicationJson.settings.hasOwnProperty(
+          Constants.ROUTER_KEY
+        )
       )
       if (
         application &&
-        !application.applicationJson.settings.hasOwnProperty('children') &&
+        !application.applicationJson.settings.hasOwnProperty(
+          Constants.ROUTER_KEY
+        ) &&
         checkRequiredFields(application.applicationJson.settings)
       ) {
         const desk = application.applicationJson.settings.flow.states.find(
-          (e) => e.id.includes('desk')
+          (e) => e.id.includes(Constants.DESK)
         ).id
 
         setBotFields({
           flowId: application.applicationJson.settings.flow.id,
           deskId: desk,
           context: application.applicationJson.settings.flow.configuration.hasOwnProperty(
-            'builder:useTunnelOwnerContext'
+            Constants.CONTEXT_KEY
           )
             ? application.applicationJson.settings.flow.configuration[
-              'builder:useTunnelOwnerContext'
+              Constants.CONTEXT_KEY
             ]
-            : 'false',
+            : Constants.CONTEXT_DISABLE,
         })
       }
     } catch (error) {
@@ -69,21 +68,13 @@ function MainPage({ service, commomService, onApplicationError }) {
 
   const handleContactLoad = async (e) => {
     e.preventDefault()
-    console.log(botFields)
     setTicket()
 
-    if (contactId.includes('tunnel'))
+    if (contactId.includes(Constants.TUNNEL))
       commomService.withLoading(async () => {
         const contactTunnel = await service.getTunnelInfo(contactId)
         setTunnel(contactTunnel)
-        botFields.context === 'true'
-          ? setContact(
-            await service.getContact(
-              contactTunnel.originator,
-              contactTunnel.owner
-            )
-          )
-          : setContact(await service.getContact(contactId))
+        setContact(await service.getContact(contactId))
       })
     else
       commomService.withLoading(async () => {
@@ -108,14 +99,15 @@ function MainPage({ service, commomService, onApplicationError }) {
         tunnel.destination,
         tunnel.owner
       )
-      if (message.active) await service.sendMessage(contactId, message.value)
+      if (message.active)
+        await service.sendMessage(contact.identity, message.value)
       await service.setState(
         botFields.flowId,
         botFields.deskId,
-        contact.identity,
+        tunnel.originator,
         tunnel.owner
       )
-      setTicket(await service.createTicket(contactId))
+      setTicket(await service.createTicket(contact.identity))
     })
   }
 
@@ -126,13 +118,14 @@ function MainPage({ service, commomService, onApplicationError }) {
         tunnel.destination,
         tunnel.owner
       )
-      if (message.active) await service.sendMessage(contactId, message.value)
+      if (message.active)
+        await service.sendMessage(contact.identity, message.value)
       await service.setState(
         botFields.flowId,
         botFields.deskId,
         contact.identity
       )
-      setTicket(await service.createTicket(contactId))
+      setTicket(await service.createTicket(contact.identity))
     })
   }
 
@@ -150,8 +143,8 @@ function MainPage({ service, commomService, onApplicationError }) {
   }
 
   const handleCreateTicket = () => {
-    if (contactId.includes('tunnel')) {
-      botFields.context === 'true'
+    if (contactId.includes(Constants.TUNNEL)) {
+      botFields.context === Constants.CONTEXT_ENABLE
         ? createTicketTunnelContextEnable()
         : createTicketTunnelContextDisable()
     } else {
