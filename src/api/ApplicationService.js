@@ -123,6 +123,10 @@ export class ApplicationService {
             type: 'application/vnd.iris.ticket+json',
             resource: {
               customerIdentity: `${customerIdentity}`,
+              customerInput: {
+                type: 'text/plain',
+                value: 'Ticket Created by Create Ticket Plugin/Tool',
+              },
             },
           },
         },
@@ -193,6 +197,9 @@ export class ApplicationService {
             to: contactId,
             type: 'text/plain',
             content: message,
+            metadata: {
+              '#message.replaceVariables': 'true',
+            },
           },
         },
       })

@@ -11,9 +11,7 @@ import { ToastContainer } from 'react-toastify'
 import LoadingOverlay from 'react-loading-overlay'
 import { AxiosCommomService } from './api/AxiosCommomService'
 import { CommomService } from './api/CommomService'
-import { Form, Col, Row } from 'react-bootstrap'
-import Brazil from './assets/Brazil.svg'
-import USA from './assets/United_States.svg'
+
 function App() {
   const [isHttp, setIsHttp] = useState(false)
   const [isFormHttpFilled, setIsFormHttpFilled] = useState(false)
@@ -52,15 +50,6 @@ function App() {
         />
         <PageHeader title={title} />
         <PageTemplate title={title}>
-          <Row>
-            <Col md="10"></Col>
-            <Col md="2">
-              <Form.Control as="select" defaultValue="English">
-                <option>English</option>
-                <option>Português </option>
-              </Form.Control>
-            </Col>
-          </Row>
           <LoadingOverlay
             active={isLoading}
             spinner

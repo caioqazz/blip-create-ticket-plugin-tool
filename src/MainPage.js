@@ -177,13 +177,14 @@ function MainPage({ service, commomService, onApplicationError }) {
           handleContactLoad(e)
         }}
       >
-        <Form.Label>Contact Id</Form.Label>
+        <Form.Label>Contact Identity</Form.Label>
         <Form.Control
           type="text"
           value={contactId}
           onChange={(e) => {
             setContactId(e.target.value)
           }}
+          placeholder="cce2364f-0818-42b4-9b61-53dc7011a9dd.bot@0mn.io"
           required
         />
         <br />
@@ -224,6 +225,7 @@ function MainPage({ service, commomService, onApplicationError }) {
                 <Form.Control
                   as="textarea"
                   rows={3}
+                  placeholder="Hello ${contact.name}, how are you?"
                   value={message.value}
                   onChange={(e) => {
                     setMessage({ ...message, value: e.target.value })

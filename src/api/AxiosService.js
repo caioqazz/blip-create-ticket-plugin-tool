@@ -39,6 +39,9 @@ export class AxiosService {
       to: contactId,
       type: 'text/plain',
       content: message,
+      metadata: {
+        '#message.replaceVariables': 'true',
+      },
     }
     try {
       const url = this.url.replace('commands', 'messages')
@@ -127,6 +130,10 @@ export class AxiosService {
       type: 'application/vnd.iris.ticket+json',
       resource: {
         customerIdentity: `${customerIdentity}`,
+        customerInput: {
+          type: 'text/plain',
+          value: 'Ticket Created by Create Ticket Plugin/Tool',
+        },
       },
     }
 
