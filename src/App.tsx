@@ -11,6 +11,8 @@ import { ToastContainer } from 'react-toastify'
 import LoadingOverlay from 'react-loading-overlay'
 import { AxiosCommomService } from './api/AxiosCommomService'
 import { CommomService } from './api/CommomService'
+import ReactGA from 'react-ga'
+import Footer from './Footer'
 
 function App() {
   const [isHttp, setIsHttp] = useState(false)
@@ -27,12 +29,13 @@ function App() {
 
   useEffect(() => {
     AxiosCommomService.setLoadingHookFunc(setIsLoading)
+    ReactGA.initialize(process.env.REACT_APP_GA_KEY)
     AxiosCommomService.withLoading(async () => {
       setIsHttp(!(await ApplicationService.ping()))
     })
   }, [])
 
-  const title: string = `Blip - Create a ticket ${isHttp ? 'Tool' : 'Plugin'}`
+  const title: string = `Blip ${isHttp ? 'Tool' : 'Plugin'} - Create a ticket`
 
   return (
     <CommonProvider>
@@ -76,10 +79,12 @@ function App() {
                 service={!isHttp ? ApplicationService : AxiosService}
                 commomService={!isHttp ? CommomService : AxiosCommomService}
                 onApplicationError={setIsFormHttpFilled}
+                isHttp={isHttp}
               />
             )}
           </LoadingOverlay>
         </PageTemplate>
+        <Footer />
       </div>
     </CommonProvider>
   )
