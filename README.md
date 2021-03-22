@@ -1,132 +1,75 @@
-[![Blip-plugin](https://imgur.com/B8dPNgk.png 'Blip-plugin')][blip]
+![Blip-plugin](https://imgur.com/B8dPNgk.png 'Blip-plugin')
+# BLiP Broadcast List Plugin/Tool
 
-# BLiP plugin
+This is a BLiP example plugin/tool designed to help users create tickets whenever they wish for any contact with ease.
 
-BLiP plugin it's a technology-agnostic way to plug unnoficial features to enhance the portal capabilities.
+Visit the sample [page here](https://blip-create-ticket-plugin-tool.netlify.app).
 
-This project aims to give the initial skill needed to develop and build your own plugins.
+## What is possible to do with this plugin/tool
 
-## Getting started from sample
+1. View all contact information.
 
-This sample was made using the React framework.
+![View all contact information](./imgs/img1.png)
+2. Update a contact information.
+
+![Update a contact information](./imgs/img2.png)
+3. Send a message after create a ticket.
+
+![Send a message after create a ticket](./imgs/img3.png)
+4. Create a ticket for any contact.
+
+![Create a ticket for any contact](./imgs/img4.png)
+
+## Connecting the plugin to your bot
+
+1. Access your bot's advanced configuration.
+2. Set the follow tuple:  
+   **Domain**: `postmaster@portal.blip.ai`  
+   **Key**: `Plugins`  
+   **Value**:
+
+```json
+{
+  "create-ticket-plugin": {
+    "name": "Create a Ticket",
+    "url": "https://blip-create-ticket-plugin-tool.netlify.app"
+  }
+}
+```
+
+
+See the result below:
+![Define information in advanced settings](./imgs/advanced_configuration.png)
+
+3. Access the following path shown below to use the plugin:
+
+![Path to access the plugin](./imgs/img0.png)
+
+## Using the project as a Tool
+
+1. Access the [url project](https://blip-create-ticket-plugin-tool.netlify.app)
+   ![Project as a Tool](./imgs/tool.png)
+2. Fill in the fields key with your bot information, you can find this information following the image bellow:
+   ![How to get your bot information](./imgs/bot-info.png)
+3. Click on load button.
+
+## Getting started from this project
 
 1. Download or clone the project from `git`(the recommended way):
 
-`git clone https://github.com/takenet/blip-plugin-sample.git`
 
-2. Install all packages from npm:
+`git clone https://github.com/takenet/blip-tools.git`
 
-`cd sample && npm install`
+2.  Access the project folder:
 
-3. Run the project:
+`cd projectFolder `
+
+3. Install all packages from npm:
+
+`npm install`
+
+4. Run the project:
 
 `npm start`
 
-4. Now just add the plugin to your chatbot and enjoy!
-
-## Good to know
-
-- All the communication between your plugin and portal should be made using the browser message API. We highly recommend you to use our official [package][iframe-message] which was been designed to that communication.
-- We recomend you to create plugins with components and colors similar to our design system, we have a official [package][blip-toolkit] to help with that.
-- After the first render of plugin, if the window size is too small, you will have to change it through the `HeightChange` message.
-- We have some guidelines to create new pages, we recommend you to follow their(it's in portuguese):
-
-![Page guidelines 1](https://i.imgur.com/0gEvaxT.png 'Page guidelines 1')
-
-![Page guidelines 2](https://i.imgur.com/gMfUMjG.png 'Page guidelines 2')
-
-![Page guidelines 3](https://i.imgur.com/QPil55Q.png 'Page guidelines 3')
-
-## Possible message types
-
-**`SendCommand`**
-
-Send a blip command. Destination defines the domain which it should send(`msging.net` or `blip.ai`), if you don't know which to choose, leave the default.
-
-```
-{
-    command: Lime.Command,
-    destination?: 'BlipService' | 'MessagingHubService',
-    timeout?: number
-}
-```
-
-**`StartLoading`**
-
-Start a loading screen on portal.
-
-**`StopLoading`**
-
-Stop the loading screen.
-
-**`HeightChange`**
-
-Change the iframe height.
-
-```
-height: number
-```
-
-**`ShowModal`**
-
-Show a modal to user.
-
-```
-{
-    title: string,
-    body: HTMLString,
-    confirm: string,
-    cancel: string
-}
-```
-
-**`HideNavbar`**
-
-Hide the navbar.
-
-**`ShowNavbar`**
-
-Shows the navbar.
-
-**`GetCurrentLanguage`**
-
-Get the user current language.
-
-**`Toast`**
-
-Create a toast.
-
-```
-{
-    type: 'info' | 'success' | 'warning' | 'danger' | 'refresh',
-    message: string
-}
-```
-
-**`GetApplication`**
-
-Get an application or the current application.
-
-```
-applicationId?: string
-```
-
-**`HasPermissions`**
-
-Check if user has some permission.
-
-```
-{
-    permissionType: string,
-    customArea?: string,
-    customShortName?: string
-}
-```
-
-**`GetPermissionsObject`**
-
-Get the entire permission object.
-
-[blip]: https://blip.ai
-[iframe-message]: https://github.com/takenet/iframe-message-proxy
-[blip-toolkit]: https://www.npmjs.com/package/blip-toolkit
+5. Now just add the plugin to your chatbot and enjoy!
