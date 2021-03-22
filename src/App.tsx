@@ -29,8 +29,6 @@ function App() {
 
   useEffect(() => {
     AxiosCommomService.setLoadingHookFunc(setIsLoading)
-    console.log(process.env);
-    
     ReactGA.initialize(`${process.env.REACT_APP_GA_KEY}`)
     AxiosCommomService.withLoading(async () => {
       setIsHttp(!(await ApplicationService.ping()))
