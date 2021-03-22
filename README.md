@@ -1,5 +1,5 @@
 ![Blip-plugin](https://imgur.com/B8dPNgk.png 'Blip-plugin')
-# BLiP Broadcast List Plugin/Tool
+# BLiP Plugin/Tool - Create a ticket
 
 This is a BLiP example plugin/tool designed to help users create tickets whenever they wish for any contact with ease.
 
