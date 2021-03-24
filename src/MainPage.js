@@ -175,7 +175,6 @@ function MainPage({ service, commomService, onApplicationError, isHttp }) {
   useEffect(() => {
     commomService.withLoading(async () => {
       await fetchApi()
-      ReactGA.initialize(process.env.REACT_APP_GA_KEY)
     })
   }, [service, commomService])
 
